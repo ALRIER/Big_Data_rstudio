@@ -265,4 +265,43 @@ gapminder %>%
   group_by(year) %>% 
   summarise(promvida = mean(lifeExp))
 
+#comando across ---------------------------------------------------
+'''nos ayuda a aplicar un mismo comando sobre diferentes lineas de codigo o sobre una variable especifica'''
 
+'''si quiero sacar el minimo, maximo y media de la esperanza de vida, del producto
+percapital del pais y de la vairbale llmada gdp, pordia hacerlo asi:'''
+
+gapminder %>%
+  group_by(year) %>%
+  summarise(
+
+    # Esperanza de vida
+    lifeExp_min = min(lifeExp),
+    lifeExp_max = max(lifeExp),
+    lifeExp_mean = mean(lifeExp),
+
+    # Poblacion
+    pop_min = min(pop),
+    pop_max = max(pop),
+    pop_mean = mean(pop),
+
+    # GDP
+    gpd_min = min(gdpPercap),
+    gpd_max = max(gdpPercap),
+    gpd_mean = mean(gdpPercap)
+
+  )
+  
+  '''o podria hacerlo mucho mas facil, asi:'''
+  
+  gapminder %>%
+  group_by(year) %>%
+  summarise(
+    across(
+      c(lifeExp,pop, gdpPercap), 
+      list(min, max, mean)
+         )
+  )
+  
+  
+  
