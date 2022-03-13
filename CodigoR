@@ -1,25 +1,3 @@
-#################Tipos de datos#########################
-#######################################################
-
-##Tipo######Comprobación######Coerción:
-#array######`is.array()`#####`as.array()`
-#character##`is.character()`#`as.character()`
-#complex####`is.complex()`###`as.complex()`
-#double#####`is.double()`####`as.double()`
-#factor#####`is.factor()`####`as.factor()`
-#integer####`is.integer()`###`as.integer()`
-#list#######`is.list()`######`as.list()`
-#logical####`is.logical()`###`as.logical()`
-#matrix#####`is.matrix()`####`as.matrix()`
-#NA#########`is.na()`########`as.na()`
-#NaN########`is.nan()`#######`as.nan()`
-#NULL#######`is.null()`######`as.null()`
-#numeric####`is.numeric()`###`as.numeric()`
-#vector#####`is.vector()`####`as.vector()`
-'''Lista de más acciones relacionadas''' 
-ls(pattern = "^is", baseenv()) #IS
-ls(pattern = "^as", baseenv()) #AS
-
 pkg <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -28,56 +6,61 @@ pkg <- function(pkg){
 }
 
 packages <- c("tidyverse","raster","sf","ggspatial","cluster","factoextra",
-              "NbClust","tidyr","forecast","semPlot","semTools","corrplot",
+              "NbClust","tidyr","forecast","semTools","corrplot",
               "corrr","haven","psych","dplyr","lavaan","readr","cvms","tm",
               "NLP","SnowballC","RColorBrewer","wordcloud","wordcloud2",
               "RefManageR","bibliometrix","GGally","quanteda","ggplot2",
-              "ggpubr","Factoshiny","syuzhet","tm","RColorBrewer","tokenizers",
+              "ggpubr","Factoshiny","syuzhet","RColorBrewer","tokenizers",
               "stringr","sentimentr","stringi","stopwords","twitteR",
-              "mscstexta4r","plyr","corrplot","psych","corrr","latticeExtra",
+              "mscstexta4r","plyr","psych","corrr","latticeExtra",
               "semPlot","lavaan","readr","lme4","sjPlot","gvlma","Rcmdr",
-              "tidymodels","caret","lmtest","gapminder",)
+              "tidymodels","caret","lmtest","gapminder","png","rtweet","knitr")
 
 pkg(packages)
 
 #Cómo abrir un archivo desde el equipo?
 #Escribo el comando read_csv('dentro la ruta de mi archivo')
-read_csv('')
+archivo <- read_csv('/home/alrier/Documentos/movies datasets/WideReleasesCount.csv')
+cars<-read_csv('/home/alrier/Documentos/Big_data/USA_cars_datasets.csv')
+data("gapminder")
+archivo <- WideReleasesCount
 
 #VECTORES----------------------------------------
 a <- c(2,4,1,8)
 b <- c(2,2,2,2)
 
 #Puedo poseer diferentes tipos de vectores
-vector_double <- c(1, 2.5, 4.5, 25)
+vector_double <-c(1, 2.5, 4.5, 25)
 # Con el sufijo L, conseguimos un integer en lugar de un double
-vector_integer <- c(1L, 6L, 10L)
+vector_integer <-c(1L, 6L, 10L)
 # Usamos TRUE y FALSE (o T y F) para crear vectores lógicos
-vector_logical <- c(TRUE, FALSE, T, F)
-vector_character <- c("Hola", "Mundo!")
+vector_logical <-c(TRUE, FALSE, T, F)  
+vector_character <-c("Hola", "Mundo!", "4343434", "ssfkjdfdkjflkshfklj")
 
 #Length nos ayuda a conocer la longitud de cualquier vector. 
 length(vector_logical)
+length(vector_double)
+length(archivo)
 
 #Operaciones Vectorizadas-------------------------------------------------------------
-a+b
-a/b
+c<-a+b
+c<-a/b
 #reciclaje de elementos en los vectores. 
 
 '''supongamos que tenemos dos vectores a y b'''
 a<-c(1,2)
 b<-c(1,2,3,4)
 '''pero deseamos crear una operaicón con estos dos vectores sumandolos'''
-a+b
+d<-a+b
 '''veremos que el resultado de ellos es la suma de las dos primeras partes del vector
 y R recicla la otra parte del vector para no perder datos'''
-# el resultado es el mismo del ejercicio pasado 4  6  3 10
+
 
 #Matrices--------------------------------------------------------------------
 #Para crear matrices utilizaremos la función matrix() , la sintaxis es la siguiente
 str(matrix)
 function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL)
-'''A continuación mostramos la descripción de los argumentos:
+  '''A continuación mostramos la descripción de los argumentos:
 data = es el vector que contiene los elementos que formaran parte de la matriz.
 nrow = es el número de filas.
 ncol = es el número de columnas.
@@ -94,9 +77,18 @@ automoviles <- matrix(
   dimnames = list( #nombre de las filas y las columnas
     c("Blanco", "Rojo", "Negro", "Gris"),
     c("Toyota", "Audi", "Nissan")
-    )
   )
-automoviles
+)
+
+automoviles <- matrix(
+  1:12,
+  nrow = 4, 
+  byrow = TRUE,
+  dimnames = list(
+    c("Blanco", "Rojo", "Negro", "Gris"),
+    c("Toyota", "Audi", "Nissan")
+  )
+)
 
 #cbind(), rbind() agregar filas y columnas organizandolas de forma manual. 
 
@@ -104,6 +96,11 @@ v1 <- c(1, 2, 3)
 v2 <- c(4, 5, 6)
 m1 <- cbind(v1, v2)
 m1
+
+nombres <- c("Pedro","Maria","Juan")
+apellidos <- c("Gonzales", "Gomez", "vuelolindo")
+nomrbres_y_apellidos <- rbind(nombres,apellidos)
+nomrbres_y_apellidos2 <- cbind(nombres,apellidos)
 
 v1 <- c(1, 2, 3)
 v2 <- c(4, 5, 6)
@@ -116,16 +113,25 @@ lista
 
 #nombrar listas 
 '''se puede nombrar las listas como se desee una vez se han creado'''
-data_list <- list(c("Jan","Feb","Mar"), #aquí creo las listas
-                  matrix(c(1,2,3,4,-1,9), #asigno categirias a lo que hay dentro
-                         nrow = 2),list("Red",12.3)) 
+data_list <- list(c("enero","Febrero","Marzo"), #aquí creo las listas
+                  matrix(c(1,2,3,4,-1,9), nrow = 2),#asigno categirias a lo que hay dentro
+                  list("Rojo",12.3))
+
+
+#con el comando names yo puedo nombrar los objetos dentro de una lista
+#el comando es names(introduzco el nombre del objeto a nombrar)
 names(data_list) <- c("listaA", "listaB", "listaC") #aquí nombro las listas
-print(data_list) #aquí imprimo el contenido de las listas
+data_list #aquí imprimo el contenido de las listas
 
 listab.1 <-data_list$listaB #aquí extraigo la lista B en un objeto 
 #nuevo que se llamará listab.1
 
-print(data_list[1]) #así accedo a las listas e imprimo su contenido. 
+archivo.1 <- archivo$`SONY PICTURES`
+archivo2 <- archivo$`PARAMOUNT PICTURES`
+
+tabla<-cbind(archivo.1,archivo2)
+
+print(data_list[3]) #así accedo a las listas e imprimo su contenido. 
 
 data_list[4] <- "New element" #agrego un nuevo elemento a la lista (al final)
 print(data_list[4]) 
@@ -133,9 +139,8 @@ print(data_list[4])
 data_list[4] <- NULL #remover el elemento 
 print(data_list[4]) #se elimina el último elemento agregado.
 
-data_list[3] <- matrix (c #modifico el 3er elemento de la lista
-                        (matrix(1,2,3,4,-1,9), 
-                          nrow = 2),list("Red",12.3)) 
+#modifico el 3er elemento de la lista
+#*********************
 
 print(data_list[3])
 
@@ -150,7 +155,7 @@ el contenido de las que antes eran dos listas separadas. '''
 
 #data.frame()-------------------------------------------------------------
 #IMPORTANTE
-nombre <- c("Juan", "Ruben", "Daniel") 
+nombre <- c("Juan", "Ruben", "Daniel", 0) 
 apellido <- c("Sanchez", "Garcia", "Sancho", "Alfara") 
 fecha_nacimiento <- c("1976-06-14", "1974-05-07", "1958-12-25", "1983-09-19")
 sexo <- c("HOMBRE", "MUJER", "HOMBRE", "HOMBRE")
@@ -159,12 +164,14 @@ nro_hijos <- c(1, 2, 3, 4)
 censo <- data.frame(nombre, apellido, fecha_nacimiento, sexo, nro_hijos) 
 #ojo al error... arguments imply differing number of rows: 3,4. 
 
+
+
 '''se debe tener en cuenta que el dataframe está conformoado por un número 
 de vectores, los cuales para poder realizar operaciones aritméticas de adeción
 mezcla u otra operación deben poseer un número igual de datos'''
 
 int_vec <- c(1,2,3) #creo 3 vectores un con enteros, otro con caracteres 
-char_vec <- c("a", "b", "c")# y uno con boleanos. 
+char_vec <- c("a", "bsvjkzlkvdnl<zkjvdnl", "zdvzxvzxbc")# y uno con boleanos. 
 bool_vec <- c(TRUE, TRUE, FALSE)
 
 data_frame <- data.frame(int_vec, char_vec,bool_vec)#crearé mi dataframe
@@ -175,7 +182,7 @@ employee_data <- data.frame(
   employee_name = c("Jaime","Henrry","julia","Jimmy","Oliver"), #5 nombres
   sal = c(642.3,535.2,681.0,739.0,925.26), #5 "salarios" hipoteticos
   join_date = as.Date(c("2013-02-04", "2017-06-21", "2012-11-14", "2018-05-19","2016-03-25"))
-  )
+)
 
 #que tipo de variables componen mi Dataframe?
 str(employee_data)
@@ -192,7 +199,7 @@ c<- c(1,2,3,4,5)
 mix2 <- cbind(mix, c)
 mix2
 #la convierto en dataframe
-mix2df <- as.data.frame(mix2)
+pan <- as.data.frame(mix2)
 mix2df#cuál fue la diferencia?
 
 #ahora, de un dataframe, yo puedo extraer varios elementos a la vez
@@ -202,6 +209,8 @@ print(output)
 output <- employee_data[1:2,0]#debería ser este el comando?
 #error, puesto que extrae la columna 0
 output <- employee_data[1:2,]
+output <- employee_data[1:5,]
+output <- employee_data[,2]
 print(output)
 
 #ahora, extraigo 1 y 2 row con la columa 3 y 4.
@@ -210,9 +219,10 @@ result
 
 #agregando columnas
 employee_data$deptartamento <- c("tecología","Finanzas","Operaciones",
-                        "recursos humanos","Administración")
+                                 "recursos humanos","Administración")
 out <- employee_data
 print(out)
+
 
 #creo un nuevo dataframe
 employee_new_data <- data.frame(
@@ -220,7 +230,7 @@ employee_new_data <- data.frame(
   employee_name = c("Amanda", "Mauricio", "Andres", "Pedro", "Manuel"),
   sal = c(523.0,721.3,622.8,721.3,622.8),
   deptartamento = c("tecología","Finanzas","Operaciones",
-                     "recursos humanos","Administración"),
+                    "recursos humanos","Administración"),
   join_date = as.Date(c("2015-06-22","2016-04-30","2011-03-17","2016-04-30",
                         "2011-03-17")), stringsAsFactors = FALSE)
 
@@ -232,19 +242,26 @@ employee_out_data
 
 #Báses de trabajo con dyplyer-------------------------------------
 #cargaré los datos de la libreria
-data("gapminder")
+
 #rectifico que hayan quedado bien cargados
+data("gapminder")
 head(gapminder)
 
-
-# filtrar datos por pais sin %>% 
-filter(gapminder, country == 'Mexico')
+head(archivo)
+view(archivoo)
+# filtrar datos por pais sin %>%  == >=  
+f<-filter(gapminder, country == 'Mexico')
+#extraer todos los registros de todos los registros de sony para el año2018
+filtro1<-filter(gapminder, country == '')
 # filtrar datos por pais
 # para hacer %>% en RStudio (cntrl + shift + M)
-gapminder %>% 
+f<- gapminder %>%
   filter(country == 'Mexico')
+
+continentes<-gapmider %>% 
+  filter(continent == 'Asia')
 # filtrar datos por año
-gapminder %>% 
+año<- gapminder %>% 
   filter(year == '1952')
 # filtrar paises con esperanza de vida mayor o igual a 40 y el año en 2002
 gapminder %>% 
@@ -253,17 +270,55 @@ gapminder %>%
 # hacer resumenes de datos---------------------------------------------
 
 # cantidad de paises en Asia para el año 2007 
-gapminder %>% 
+paises<-gapminder %>% 
   filter(continent == 'Asia',
-         year == 2007) %>% 
+         year == 2007) %>%
   summarise(conteo = n())
+
 # maxima esparanza de vida
-gapminder %>% 
-  summarise(esperanza = max(lifeExp))
+q<-gapminder %>% 
+  summarise(max(lifeExp))
 # agrupando esperanza de vida promedio por año
-gapminder %>% 
+promedio<-gapminder %>% 
   group_by(year) %>% 
-  summarise(promvida = mean(lifeExp))
+  summarise(mean(lifeExp))
+
+#dyplyer más a profundidad----------------------------------------------------
+archivo %>%
+  group_by(YEAR) %>%
+  summarize(mean(UNIVERSAL))
+
+z<-gapminder %>%
+  group_by(continent, year) %>%
+  summarize(sum(lifeExp))
+
+z1<- gapminder%>%
+  group_by(year) %>%
+  filter(continent == 'Asia') %>%
+  mutate(asiaxaño = m(pop))
+
+#función mutate
+z1<- archivo %>%
+  group_by(YEAR) %>%
+  filter(UNIVERSAL == 10) %>%
+  mutate(Pelis = mean(UNIVERSAL))
+
+
+# el objeto está comprendido en. 
+employee_new_data %>%
+  filter(employee_name %in% c("Amanda")) 
+
+# La objeto NO esta comprendido en. 
+employee_new_data %>%
+  filter(!employee_name %in% c("Amanda"))
+
+#un filtro de todos los años que tengan 0, despues haga un mutate en una
+#columna nueva y guardelos seguncontengan o no el comando que yo le indique. 
+ceros<-archivo_tible %>%
+  mutate(
+    contiene_0 = grepl('0', YEAR)) %>%
+  select_('YEAR', 'contiene_0')
+
 
 #comando across ---------------------------------------------------
 '''nos ayuda a aplicar un mismo comando sobre diferentes lineas de codigo o sobre una variable especifica'''
@@ -274,34 +329,182 @@ percapital del pais y de la vairbale llmada gdp, pordia hacerlo asi:'''
 gapminder %>%
   group_by(year) %>%
   summarise(
-
+    
     # Esperanza de vida
     lifeExp_min = min(lifeExp),
     lifeExp_max = max(lifeExp),
     lifeExp_mean = mean(lifeExp),
-
+    
     # Poblacion
     pop_min = min(pop),
     pop_max = max(pop),
     pop_mean = mean(pop),
-
+    
     # GDP
     gpd_min = min(gdpPercap),
     gpd_max = max(gdpPercap),
     gpd_mean = mean(gdpPercap)
-
+    
   )
-  
-  '''o podria hacerlo mucho mas facil, asi:'''
-  
-  gapminder %>%
+
+'''o podria hacerlo mucho mas facil, asi:'''
+
+gapminder %>%
   group_by(year) %>%
   summarise(
     across(
       c(lifeExp,pop, gdpPercap), 
       list(min, max, mean)
-         )
+    )
   )
-  
-  
-  
+
+
+
+#TRABAJANDO CON TWITTER-----------------------------------------------
+
+'''primero que nada hay que acceder a la APLI de twitter para tener acceso a 
+toda la información de la plataforma, una vez ahí debemos entrar a la aplicación
+de las apps que tenemos desarrolladas, debemos buscar los keys y credenciales
+de las apps que trabajaremos.'''
+
+setup_twitter_oauth("6gMch1lkCfn3W5PZho3X4jh8W",#api key
+                    "eBosfeWmQVBLQ87WiVMaRXousYRdyOkyhLkvCUzw7ioz0EMCWY",#api secret key
+                    "284827529-UENNMA2jVHCRBYwcddd6obAAZvaJ0hUVSapYYmwZ",#acces token
+                    "sb1fgjDG9CSugsU5qsWJWkBOvP91FxJmcm7hKCyajrndT")#acces token secret
+
+'''Uso el comando searchTwitter para buscar información dentro de twitter con 
+la palabra clave que yo deseo buscar'''
+
+a<- searchTwitter("Petro", n=100)
+a[1:100]
+C1<-searchTwitter('Claudia Lopez', since='2020-03-01', until='2022-03-02', n=200)
+C2<-searchTwitter('@ClaudiaLopez', since='2020-03-01', until='2022-03-02', n=200)
+C3<-userTimeline('@ClaudiaLopez', since='2020-03-01', n=200)
+C3[1]
+#searchTwitter('Claudia Lopez', resultType = "popular"/"recent")
+
+petroski<-searchTwitter('Petro', n=500)
+
+#creando un dataframe con la información obtenida. 
+
+#quí extraigo los tw
+a<-twListToDF(a)
+#hago elfiltro de los retweets mayores o iguales a 1000 (los mas populares)
+petro <-petroski %>%
+  filter(retweetCount >= 1000)
+#extraigo el texto a una variable llamada te
+a<-a$text
+#hago el analisis de sentimiento
+sentimientos_df <- get_nrc_sentiment(te, lang="spanish")
+s<-summary(sentimientos_df)
+
+#Hago la grafica de barras
+barplot(
+  colSums(prop.table(sentimientos_df[, 1:8])),
+  space = 0.2,
+  horiz = FALSE,
+  las = 1,
+  cex.names = 0.7,
+  col = brewer.pal(n = 8, name = "Set3"),
+  main = "Uso de twitter para webscraping",
+  sub = "Análisis de sentimientos",
+  xlab="emociones", ylab = "Frecuancia")
+
+#AHORA TRABAJANDO CON RTWEET--------------------------------------------------
+#parse es el comando usado para recibid un data frame o una lista de objetos.
+create_token(app="Clase_big_data",
+             consumer_key = "6gMch1lkCfn3W5PZho3X4jh8W",#api key
+             consumer_secret = "eBosfeWmQVBLQ87WiVMaRXousYRdyOkyhLkvCUzw7ioz0EMCWY",#api secret key
+             access_token ="284827529-UENNMA2jVHCRBYwcddd6obAAZvaJ0hUVSapYYmwZ",#acces token
+             access_secret ="sb1fgjDG9CSugsU5qsWJWkBOvP91FxJmcm7hKCyajrndT")#acces token secret
+
+C4 <- get_timeline(user = "@ClaudiaLopez", n = 200, parse = TRUE, check = FALSE)
+C5 <- get_timeline(user = "@ClaudiaLopez", n = 200, parse = F, check = FALSE)
+#Un pequeño análisis de sentimientos------------------------------------------
+te<-petro$text
+texto = Corpus(VectorSource(te)) 
+#texto_palabras <- get_tokens(a)
+sentimientos_df <- get_nrc_sentiment(te, lang="spanish")
+s<-summary(sentimientos_df)
+#barplot
+barplot(
+  colSums(prop.table(sentimientos_df[, 1:8])),
+  space = 0.2,
+  horiz = FALSE,
+  las = 1,
+  cex.names = 0.7,
+  col = brewer.pal(n = 8, name = "Set3"),
+  main = "Uso de twitter para webscraping",
+  sub = "Análisis de sentimientos",
+  xlab="emociones", ylab = "Frecuancia")
+
+
+#Ahora hagamos un data mining -----------------------------------------------
+#elimino puntución y caracteres especiales
+discurso <- gsub("[[:cntrl:]]", " ", a)
+#Convertimos todo a minúsculas.
+discurso <- tolower(discurso)
+#quto las stopwords("spanish").
+discurso <- removeWords(discurso, words = stopwords("spanish"))
+#Nos deshacemos de la puntuación.
+discurso <- removePunctuation(discurso)
+#removemos los números.
+discurso <- removeNumbers(discurso)
+'''A ESTE PASO VAMOS A REGRESAR NUEVAMENTE MAS ADELANTE CUANDO TENGAMOS LA LISTA 
+DE PALABRAS QUE NO APORTAN EN EL DOCUMENTO'''
+discurso <- removeWords(discurso, words = c("usted", "…"))
+discurso <- Corpus(VectorSource(discurso)) 
+#organizo el compendio de palabras en un objeto tipo matriz de datos
+letras<- discurso%>% TermDocumentMatrix() %>% as.matrix() 
+'''hago un vector que va a sumar la repetición de palabras en la matriz y así
+consigo la frecuencia total de palabras que hay para cada término, despues le digo
+que las sume y las organice'''
+vector <- matrix %>% rowSums() %>% sort(decreasing = TRUE)
+'''ahora bien, cabe revisar la frecuencia de palabras para así poder identificar 
+cuales de estas palabras son y cuales de estas palabras no me son útiles por eso 
+imprimo la matriz antes de que podamos sacar conclusiones del analisis'''
+view(vector)
+'''AHORA ES IMPORTANTISIMO: si veo que en el vector de palabras hay algun termino
+que esté molestando demasiado, la forma mas fácil de eliminarlo es regresar al 
+corpus y quitarlo arriba con el comando removeWords y repetir los pasos hasta 
+aquí, pero se debe tener en cuenta que es mejor retroceder y correr todos los
+comandos de limpeza nuevamente, desde el princpio, es decir, desde
+aquí discurso <- gsub("[[:cntrl:]]", " ", a) pero ahora incluyendo los terminos
+que se desea eliminar del comando removeWords'''
+#transformo todo en un dataframe
+dataletras <- data.frame(word= names(vector),frequencia=vector)  
+
+
+#findFreqTerms(letras, lowfreq=3) 
+#vector <- sort(rowSums(matrix),decreasing=TRUE)
+barplot(dataletras[1:10,]$freq, las = 2, names.arg = dataletras[1:10,]$word, 
+        col = brewer.pal(n = 8, name = "Set3"), main ="Pabalras mas frecuentes",
+        ylab = "Frecuencia de palabras") 
+
+dataletras[1:10, ] %>%
+  ggplot(aes(palabra, frec)) +
+  geom_bar(stat = "identity", color = "black", fill = "#87CEFA") +
+  geom_text(aes(hjust = 1.3, label = frec)) + 
+  coord_flip() + 
+  labs(title = "Palabras mas frecuentes",  x = "Palabras",
+       y = "Número de usos")
+
+
+wordcloud(words = dataletras$word, freq = dataletras$freq, min.freq = 3,
+          max.words=78, random.order=FALSE, rot.per=0.35,  
+          colors=brewer.pal(7, "Dark2"), scale=c(3.5,0.25))
+
+
+#wordcloud2(data=dataletras, size=0.7,
+#           color='random-dark', shape = 'triangle')
+
+
+#Puedo exportar cualquier elemento en forma de csv al computador, la formmula es:
+'''le pido al computador que write.csv (escriba un csv), entonces tendremos:
+write.csv(nombre del objeto que quiero pasar,
+le pido que lo copie con la función paste) y nombro el directorio al que lo voy a pasar
+despues el nombre del archivo, el tipo de separador que usaré, la codificación
+que usaré (generalmente UTF-8 es la del español que tiene tildes y ñ) y finalizo
+quitándole los nombres a las filas para que no moleste en caso de tenerlas...
+asi pues el comando quedaría así:'''
+#Write.csv(objetoA, paste(directorio, "nombre del nuevo archivo.csv, sep =";"), fileEncoding= "UTF-8", row.names=F)
