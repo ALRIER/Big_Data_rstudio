@@ -455,11 +455,12 @@ DE PALABRAS QUE NO APORTAN EN EL DOCUMENTO'''
 discurso <- removeWords(discurso, words = c("usted", "…"))
 discurso <- Corpus(VectorSource(discurso)) 
 #organizo el compendio de palabras en un objeto tipo matriz de datos
-letras<- discurso%>% TermDocumentMatrix() %>% as.matrix() 
+letras<- discurso%>% TermDocumentMatrix()
+letrasmatrix <- as.matrix(letras) 
 '''hago un vector que va a sumar la repetición de palabras en la matriz y así
 consigo la frecuencia total de palabras que hay para cada término, despues le digo
 que las sume y las organice'''
-vector <- matrix %>% rowSums() %>% sort(decreasing = TRUE)
+vector <- letrasmatrix %>% rowSums() %>% sort(decreasing = TRUE)
 '''ahora bien, cabe revisar la frecuencia de palabras para así poder identificar 
 cuales de estas palabras son y cuales de estas palabras no me son útiles por eso 
 imprimo la matriz antes de que podamos sacar conclusiones del analisis'''
@@ -498,6 +499,67 @@ wordcloud(words = dataletras$word, freq = dataletras$freq, min.freq = 3,
 #wordcloud2(data=dataletras, size=0.7,
 #           color='random-dark', shape = 'triangle')
 
+'''Veamos ahora cómo se asocian algunas palabras (terms) en Niebla con la 
+función findAssocs. Como podemos introducir un vector, podemos obtener las 
+asociaciones de varias palabras a la vez. He elegido 
+"Petro", "petro","Uribe", "uribe"
+
+Es importante recordar que con esto no estamos pidiendo la asociacion de estas
+cuatro palabras entre si, sino las asociaciones para cada una de las cuatro, que
+no necesariamente deben coincidir.
+
+Esta también nos pide el límite inferior de correlación (corlimit)
+para mostrarnos. Valores cercanos a 1 indican que las palabras aparecen casi
+siempre asociadas una con otra, valores cercanos a 0 nos indican que nunca o
+casi nunca lo hacen.
+
+El valor que decidamos depende del tipo de documento y el tipo de asociaciones
+que nos interesen. para nuestros fines, lo he fijado en .25.'''
+findAssocs(letras, terms = c("Petro", "petro",
+                             "Uribe", "uribe"), corlimit = .25)
+#CLUSTERING DE PALABRAS------------------------------------------------------
+'''ahora vamos a eliminar primero todos los terminos dispersos paraque no jodan,
+como se trata de una correlación los valores que manejaremos serán de 0 a 1'''
+nov_new <- removeSparseTerms(letras, sparse = .95)
+#llevamos el objeto a matriz
+nov_new <- nov_new %>% as.matrix()
+#Matriz de distancia--------------------------------------------------------
+'''Necesitamos crear una matriz de distancias para empezar agrupar, lo cual 
+requiere que los valores en las celdas sean estandarizados de alguna manera.
+
+Podríamos usar la función scale, pero realiza la estandarización usando la media
+de cada columna como referencia, mientras que nosotros necesitamos como 
+referencia la media de cada renglón.
+
+Así que obtenemos una estandarización por renglones de manera manual.'''
+nov_new <- nov_new / rowSums(nov_new)
+#Hecho esto, nuestra matriz ha sido estandarizada.
+'''Procedemos a obtener una matriz de distancia a partir de ella, con el método
+de distancias euclidianas y la asignamos al objeto nov_dist.'''
+nov_dist <- dist(nov_new, method = "euclidian")
+'''Realizaremos nuestro agrupamiento jerárquico usando la función hclust, de la
+base de R. Este es en realidad un procedimiento muy sencillo una vez que hemos
+realizado la preparación.
+
+Usaremos el método de Ward (ward.D), que es el método por defecto de la función
+hclust y asignaremos sus resultados al objeto nov_hclust.'''
+nov_hclust <-  hclust(nov_dist, method = "ward.D")
+#Graficamos los resultados usando plot para generar un dendrograma.
+plot(nov_hclust, main = "Dendrograma de Niebla - hclust", sub = "", xlab = "")
+'''De este modo podemos observar los grupos de palabras que existen en Niebla. 
+Por ejemplo, “augusto” y “eugenia” forman un grupo, “puede” y “ser”, forman otro
+grupo (“puede ser” es una frase común en este libro).
+
+Además, podemos ver qué palabras pertenecen a grupos lejanos entre sí, 
+por ejemplo, “quiero” y “verdad”.
+
+Podemos enfatizar los grupos de palabras trazando un rectángulo usando
+rect.hclust y con especificando cuántos grupos (k) deseamos resaltar.
+
+Crearemos el mismo gráfico pidiendo diez grupos.'''
+
+plot(nov_hclust, main = "Dendrograma de Niebla - hclust", sub = "", xlab = "")
+rect.hclust(nov_hclust, k = 10, border="blue")
 
 #Puedo exportar cualquier elemento en forma de csv al computador, la formmula es:
 '''le pido al computador que write.csv (escriba un csv), entonces tendremos:
