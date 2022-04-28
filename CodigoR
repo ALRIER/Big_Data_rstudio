@@ -308,7 +308,7 @@ z1<- archivo %>%
 employee_new_data %>%
   filter(employee_name %in% c("Amanda")) 
 
-# La objeto NO esta comprendido en. 
+#El objeto NO esta comprendido en. 
 employee_new_data %>%
   filter(!employee_name %in% c("Amanda"))
 
@@ -375,7 +375,7 @@ setup_twitter_oauth("6gMch1lkCfn3W5PZho3X4jh8W",#api key
 '''Uso el comando searchTwitter para buscar información dentro de twitter con 
 la palabra clave que yo deseo buscar'''
 
-a<- searchTwitter("Petro", n=100)
+a<- searchTwitter("@FicoGutierrez", n=500)
 a[1:100]
 C1<-searchTwitter('Claudia Lopez', since='2020-03-01', until='2022-03-02', n=200)
 C2<-searchTwitter('@ClaudiaLopez', since='2020-03-01', until='2022-03-02', n=200)
@@ -388,26 +388,26 @@ petroski<-searchTwitter('Petro', n=500)
 #creando un dataframe con la información obtenida. 
 
 #quí extraigo los tw
-a<-twListToDF(a)
+fico<-twListToDF(a)
 #hago elfiltro de los retweets mayores o iguales a 1000 (los mas populares)
 petro <-petroski %>%
   filter(retweetCount >= 1000)
 #extraigo el texto a una variable llamada te
-a<-a$text
+B<-fico$text
 #hago el analisis de sentimiento
-sentimientos_df <- get_nrc_sentiment(te, lang="spanish")
+sentimientos_df <- get_nrc_sentiment(B, lang="spanish")
 s<-summary(sentimientos_df)
 
 #Hago la grafica de barras
 barplot(
-  colSums(prop.table(sentimientos_df[, 1:8])),
+  colSums(prop.table(sentimientos_df[, 1:10])),
   space = 0.2,
   horiz = FALSE,
   las = 1,
   cex.names = 0.7,
-  col = brewer.pal(n = 8, name = "Set3"),
-  main = "Uso de twitter para webscraping",
-  sub = "Análisis de sentimientos",
+  col = brewer.pal(n = 10, name = "Set3"),
+  main = "Mapa de fico",
+  sub = "fico presidente",
   xlab="emociones", ylab = "Frecuancia")
 
 #AHORA TRABAJANDO CON RTWEET--------------------------------------------------
@@ -421,7 +421,7 @@ create_token(app="Clase_big_data",
 C4 <- get_timeline(user = "@ClaudiaLopez", n = 200, parse = TRUE, check = FALSE)
 C5 <- get_timeline(user = "@ClaudiaLopez", n = 200, parse = F, check = FALSE)
 #Un pequeño análisis de sentimientos------------------------------------------
-te<-petro$text
+te<-fico$text
 texto = Corpus(VectorSource(te)) 
 #texto_palabras <- get_tokens(a)
 sentimientos_df <- get_nrc_sentiment(te, lang="spanish")
@@ -441,30 +441,39 @@ barplot(
 
 #Ahora hagamos un data mining -----------------------------------------------
 #elimino puntución y caracteres especiales
-discurso <- gsub("[[:cntrl:]]", " ", a)
+discurso <- gsub("[[:cntrl:]]", " ", te)
+discurso[2]
 #Convertimos todo a minúsculas.
 discurso <- tolower(discurso)
 #quto las stopwords("spanish").
 discurso <- removeWords(discurso, words = stopwords("spanish"))
+discurso <- removeWords(discurso, words = c("hp2pdfmnfa","@iandresrm","va","https://","@",":",
+                                            "…","t.co/","👁","@christi11079874","📢","jajajajjaja",
+                                            "“","n","cad…","@lafm","plat…",
+                                            "…", "indra","dos","día","🇨🇴"))
 #Nos deshacemos de la puntuación.
 discurso <- removePunctuation(discurso)
 #removemos los números.
 discurso <- removeNumbers(discurso)
-'''A ESTE PASO VAMOS A REGRESAR NUEVAMENTE MAS ADELANTE CUANDO TENGAMOS LA LISTA 
-DE PALABRAS QUE NO APORTAN EN EL DOCUMENTO'''
-discurso <- removeWords(discurso, words = c("usted", "…"))
-discurso <- Corpus(VectorSource(discurso)) 
+#conformo un vector de palabras
+discurso1 <- Corpus(VectorSource(discurso)) 
+
+discurso=tm_map(discurso, removeWords, c("gustavo"))
 #organizo el compendio de palabras en un objeto tipo matriz de datos
-letras<- discurso%>% TermDocumentMatrix()
+letras<- TermDocumentMatrix(discurso1)
 letrasmatrix <- as.matrix(letras) 
 '''hago un vector que va a sumar la repetición de palabras en la matriz y así
 consigo la frecuencia total de palabras que hay para cada término, despues le digo
 que las sume y las organice'''
-vector <- letrasmatrix %>% rowSums() %>% sort(decreasing = TRUE)
+vector <- rowSums(letrasmatrix) 
+Vectorr<- sort(vector, decreasing = T)
 '''ahora bien, cabe revisar la frecuencia de palabras para así poder identificar 
 cuales de estas palabras son y cuales de estas palabras no me son útiles por eso 
 imprimo la matriz antes de que podamos sacar conclusiones del analisis'''
-view(vector)
+#ver el vector
+view(Vectorr)
+#Inspeccionar la matriz ordenadamente
+Vectorr[1:20]
 '''AHORA ES IMPORTANTISIMO: si veo que en el vector de palabras hay algun termino
 que esté molestando demasiado, la forma mas fácil de eliminarlo es regresar al 
 corpus y quitarlo arriba con el comando removeWords y repetir los pasos hasta 
@@ -473,8 +482,7 @@ comandos de limpeza nuevamente, desde el princpio, es decir, desde
 aquí discurso <- gsub("[[:cntrl:]]", " ", a) pero ahora incluyendo los terminos
 que se desea eliminar del comando removeWords'''
 #transformo todo en un dataframe
-dataletras <- data.frame(word= names(vector),frequencia=vector)  
-
+dataletras <- data.frame(word= names(Vectorr),freq=Vectorr)  
 
 #findFreqTerms(letras, lowfreq=3) 
 #vector <- sort(rowSums(matrix),decreasing=TRUE)
@@ -482,18 +490,34 @@ barplot(dataletras[1:10,]$freq, las = 2, names.arg = dataletras[1:10,]$word,
         col = brewer.pal(n = 8, name = "Set3"), main ="Pabalras mas frecuentes",
         ylab = "Frecuencia de palabras") 
 
+
 dataletras[1:10, ] %>%
-  ggplot(aes(palabra, frec)) +
+  ggplot(aes(word, freq)) +
   geom_bar(stat = "identity", color = "black", fill = "#87CEFA") +
-  geom_text(aes(hjust = 1.3, label = frec)) + 
+  geom_text(aes(hjust = 1.3, label = freq))+ 
   coord_flip() + 
-  labs(title = "Palabras mas frecuentes",  x = "Palabras",
-       y = "Número de usos")
+  labs(title = "Diez palabras más frecuentes",  x = "Palabras", y = "Número de usos")
 
 
-wordcloud(words = dataletras$word, freq = dataletras$freq, min.freq = 3,
-          max.words=78, random.order=FALSE, rot.per=0.35,  
-          colors=brewer.pal(7, "Dark2"), scale=c(3.5,0.25))
+dataletras %>%
+  mutate(perc = (frec/sum(frec))*100) %>%
+  .[1:10, ] %>%
+  ggplot(aes(palabra, perc)) +
+  geom_bar(stat = "identity", color = "black", fill = "#87CEFA") +
+  geom_text(aes(hjust = 1.3, label = round(perc, 2))) + 
+  coord_flip() +
+  labs(title = "Diez palabras más frecuentes en Niebla", x = "Palabras", y = "Porcentaje de uso")
+#nube de palabras sin frecuencias mínimas
+wordcloud(
+  words = dataletras$word, freq = dataletras$freq,
+  max.words = 80, 
+  random.order = F, 
+  colors=brewer.pal(name = "Dark2", n = 8)
+)
+#nube de palabras con frecuencias mónimas
+wordcloud(words = dataletras$word, freq = dataletras$freq, min.freq = 2,
+          max.words=30, random.order=FALSE, rot.per=0.35,  
+          colors=brewer.pal(7, "Dark2"), scale=c(3.5,1.25))
 
 
 #wordcloud2(data=dataletras, size=0.7,
